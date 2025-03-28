@@ -1,119 +1,132 @@
-# TIA Portal Read-Only MCP Server
+# TIA Portal Connection Test
 
-A Machine Communication Protocol (MCP) server for interfacing with Siemens TIA Portal. This server provides read-only access to TIA Portal projects for examining PLC code (SCL and LAD logic), with a focus on stability and reliability.
+This repository contains utilities to diagnose connection issues with TIA Portal:
 
-## Features
+1. **MCP Server Diagnostics**: Comprehensive diagnostics for MCP server and TIA Portal connections
+2. **tia-openness-api-client Test** (Recommended): Uses the open-source tia-openness-api-client Python package
+3. **COM-based Test**: Uses direct COM interaction with TIA Portal
 
-- **Read-Only Access**: Safely read PLC code blocks without modifying projects
-- **Robust Error Handling**: Comprehensive error handling and timeouts to prevent hanging operations
-- **Cross-Platform Timeout Support**: Custom timeout implementation that works on Windows
-- **Proper Resource Management**: Clean resource handling to prevent memory leaks
-- **Simple API**: Straightforward functions for navigating and reading PLC code
+These utilities help diagnose connection issues between Python, MCP servers, and TIA Portal.
+
+## Common Features
+
+- Tests connection to TIA Portal
+- Opens a TIA Portal project
+- Lists PLCs in the project
+- Provides detailed error reporting and diagnostics
+- Logs system information to help with troubleshooting
 
 ## Prerequisites
 
-- Windows operating system (required for TIA Portal)
 - Python 3.6 or higher
-- TIA Portal V15 or higher with Openness API installed
-- Administrator privileges for installation and execution
-- User account part of the 'Siemens TIA Openness' Windows group
+- TIA Portal installed
+- Administrative privileges may be required
 
-## Installation
+## MCP Server Diagnostics
 
-### Automatic Installation (Recommended)
+This comprehensive diagnostic tool checks:
 
-1. Clone this repository:
-   ```
-   git clone https://github.com/yourusername/tia-portal-mcp.git
-   cd tia-portal-mcp
-   ```
+- System resources (CPU, memory, disk space)
+- Network connectivity and firewall settings
+- TIA Portal installation and Openness configuration
+- MCP server status and configuration
+- TIA Portal connection test using tia-openness-api-client
 
-2. Run the installation script as administrator:
-   ```
-   install.bat
-   ```
+### Using the Batch File
 
-### Manual Installation
+1. Double-click `run_mcp_diagnostics.bat` to run the diagnostics
+2. Review the summary report displayed in the console
+3. Check the detailed logs in the `logs` directory
 
-1. Install required Python packages:
-   ```
-   pip install -r requirements.txt
-   ```
-
-2. Install the TIA Openness API client:
-   ```
-   pip install -e git+https://github.com/Repsay/tia-openness-api-client.git#egg=tia_portal
-   ```
-
-3. Register TIA Portal DLLs (if needed):
-   ```
-   register_tia_dlls.bat
-   ```
-
-## Usage
-
-### Starting the Server
-
-Run the server as administrator:
-```
-run_server.bat
-```
-
-Or directly with Python:
-```
-python server.py
-```
-
-### Connecting to Claude or Other MCP Clients
-
-1. Configure Claude to use this MCP server:
-   - Use the server name: `tia-portal`
-   - Command: `python`
-   - Arguments: `["path/to/server.py"]`
-
-2. In Claude, you can use these functions:
-   - `connect_to_tia()` - Connect to TIA Portal
-   - `open_project(project_path)` - Open a TIA project
-   - `get_plc_list()` - List all PLCs in the current project
-   - `list_blocks(plc_name)` - List all blocks in a specific PLC
-   - `read_block_code(plc_name, block_name)` - Read the code from a specific block
-   - `reconnect()` - Force reconnection to TIA Portal if issues occur
-
-### Example Workflow in Claude
+### Using Python Directly
 
 ```
-connect_to_tia()
-open_project("C:/Projects/MyProject.ap16")
-get_plc_list()
-list_blocks("PLC_1")
-read_block_code("PLC_1", "Main")
+python mcp_server_diagnostics.py
 ```
 
-## Limitations
+## tia-openness-api-client Test (Recommended)
 
-- Read-only access (cannot modify PLC programs)
-- Only SCL and LAD languages are fully supported for detailed viewing
-- Very large projects might cause timeouts
+This test uses the [tia-openness-api-client](https://github.com/Repsay/tia-openness-api-client) package which provides a more robust and structured interface to TIA Portal.
+
+### Using the Batch File
+
+1. Double-click `run_tia_client_test.bat` to run the test with the default project path
+2. To test with a different project, drag and drop the `.ap*` file onto the batch file or run:
+   ```
+   run_tia_client_test.bat "C:\path\to\your\project.ap17"
+   ```
+
+### Using Python Directly
+
+```
+python tia_test_with_client.py --project "C:\path\to\your\project.ap17"
+```
+
+## COM-based Test (Legacy)
+
+This test uses direct COM interaction with TIA Portal.
+
+### Using the Batch File
+
+1. Double-click `run_tia_test.bat` to run the test with the default project path
+2. To test with a different project, drag and drop the `.ap*` file onto the batch file or run:
+   ```
+   run_tia_test.bat "C:\path\to\your\project.ap17"
+   ```
+
+### Using Python Directly
+
+```
+python tia_connection_test.py "C:\path\to\your\project.ap17"
+```
+
+If no path is provided, the script will use the default path:
+```
+C:\Users\hvksh\Circle H2O LLC\CBG Meerut - Documents\CBG Meerut Design and Engineering\Automation\CBG_MEERUT_170824\CBG_MEERUT_170824.ap17
+```
+
+## Logs
+
+Detailed logs are saved in the `logs` directory with timestamps. These logs include:
+- System information (OS, Python version, memory, CPU)
+- Connection details and timing
+- Error messages and stack traces
+- TIA Portal version information
+- Project and PLC details
+
+## Common Issues and Solutions
+
+1. **COM Error**: Make sure TIA Portal is installed correctly and the COM objects are registered.
+2. **Access Denied**: Try running as administrator.
+3. **Project Path Not Found**: Check that the project path is correct and accessible.
+4. **TIA Portal Already Running**: Close any open instances of TIA Portal and try again.
+5. **Memory Issues**: Check the logs for memory usage and ensure you have enough available RAM.
+6. **Firewall Blocking**: Ensure Windows Firewall allows the MCP server and TIA Portal to communicate.
+7. **TIA Openness Disabled**: Enable Openness in TIA Portal settings.
+8. **MCP Server Not Running**: Check if the MCP server is running and properly configured.
 
 ## Troubleshooting
 
-See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for common issues and solutions.
+If the test fails:
+1. Check the log files in the `logs` directory
+2. Look for specific error messages or exceptions
+3. Check the system information section for resource constraints
+4. Verify TIA Portal is installed and working correctly
+5. Try running TIA Portal manually first, then close it and run the test
+6. Use the MCP Server Diagnostics to get a comprehensive report of all possible issues
 
-## License
+## Dependencies
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+The scripts automatically install these dependencies if missing:
 
-## Acknowledgements
+### MCP Server Diagnostics:
+- tia-openness-api-client (for TIA Portal interaction)
+- psutil (for system information)
 
-- [tia-openness-api-client](https://github.com/Repsay/tia-openness-api-client) - Python client for TIA Portal Openness API
-- Siemens for the TIA Portal Openness API
+### tia-openness-api-client Test:
+- tia-openness-api-client (for TIA Portal interaction)
+- psutil (for system information)
 
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+### COM-based Test:
+- pywin32 (for COM interaction with TIA Portal)
+- psutil (for system information)
